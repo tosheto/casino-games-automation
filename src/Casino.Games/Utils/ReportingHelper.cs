@@ -8,26 +8,42 @@ namespace Casino.Games.Utils
 {
     public static class ReportingHelper
     {
+        private static string EnsureDir(string sub)
+        {
+            var root = AppContext.BaseDirectory;
+            var dir = Path.Combine(root, "artifacts", sub);
+            Directory.CreateDirectory(dir);
+            return dir;
+        }
+
+        private static string SafeName(string name)
+        {
+            foreach (var c in Path.GetInvalidFileNameChars())
+                name = name.Replace(c, '_');
+            return name;
+        }
+
         public static async Task<string> CaptureScreenshotAsync(IPage page, string name)
         {
             try
             {
-                var fileName = $"{Sanitize(name)}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.png";
-                var path = Path.Combine(AppContext.BaseDirectory, fileName);
+                var dir = EnsureDir("screenshots");
+                var fileName = $"{SafeName(name)}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.png";
+                var fullPath = Path.Combine(dir, fileName);
 
                 await page.ScreenshotAsync(new PageScreenshotOptions
                 {
-                    Path = path,
+                    Path = fullPath,
                     FullPage = true
                 });
 
-                TestContext.AddTestAttachment(path);
-                TestContext.WriteLine($"[Reporting] Screenshot saved: {path}");
-                return path;
+                TestContext.WriteLine($"[Reporting] Screenshot saved: {fullPath}");
+                TestContext.AddTestAttachment(fullPath);
+                return fullPath;
             }
             catch (Exception ex)
             {
-                TestContext.WriteLine($"[Reporting] Screenshot failed: {ex.Message}");
+                TestContext.WriteLine($"[Reporting] Screenshot failed: {ex}");
                 return string.Empty;
             }
         }
@@ -36,27 +52,51 @@ namespace Casino.Games.Utils
         {
             try
             {
-                var html = await page.ContentAsync();
-                var fileName = $"{Sanitize(name)}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.html";
-                var path = Path.Combine(AppContext.BaseDirectory, fileName);
+                var dir = EnsureDir("html");
+                var fileName = $"{SafeName(name)}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.html";
+                var fullPath = Path.Combine(dir, fileName);
 
-                File.WriteAllText(path, html);
-                TestContext.AddTestAttachment(path);
-                TestContext.WriteLine($"[Reporting] HTML dump saved: {path}");
-                return path;
+                var html = await page.ContentAsync();
+                File.WriteAllText(fullPath, html);
+
+                TestContext.WriteLine($"[Reporting] HTML dump saved: {fullPath}");
+                TestContext.AddTestAttachment(fullPath);
+                return fullPath;
             }
             catch (Exception ex)
             {
-                TestContext.WriteLine($"[Reporting] HTML dump failed: {ex.Message}");
+                TestContext.WriteLine($"[Reporting] HTML dump failed: {ex}");
                 return string.Empty;
             }
         }
 
-        private static string Sanitize(string name)
+        public static async Task AttachVideosAsync(IBrowserContext context)
         {
-            foreach (var c in Path.GetInvalidFileNameChars())
-                name = name.Replace(c, '_');
-            return name;
+            try
+            {
+                var dir = EnsureDir("videos");
+
+                foreach (var page in context.Pages)
+                {
+                    var video = page.Video;
+                    if (video == null) continue;
+
+                    var path = await video.PathAsync();
+                    if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                        continue;
+
+                    var fileName = $"{SafeName(page.Url)}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.webm";
+                    var dest = Path.Combine(dir, fileName);
+                    File.Copy(path, dest, true);
+
+                    TestContext.WriteLine($"[Reporting] Video saved: {dest}");
+                    TestContext.AddTestAttachment(dest);
+                }
+            }
+            catch (Exception ex)
+            {
+                TestContext.WriteLine($"[Reporting] AttachVideos failed: {ex}");
+            }
         }
     }
 }
