@@ -1,4 +1,4 @@
-﻿name: CI - Casino.Games Tests
+﻿name: CI - Casino.Games Desktop & Mobile
 
 on:
   push:
@@ -10,6 +10,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [ desktop, mobile ]
+
+    name: Run tests (${{ matrix.target }})
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,7 +24,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: "9.0.x"
 
       - name: Restore dependencies
         run: dotnet restore src/Casino.Games/Casino.Games.csproj
@@ -29,5 +36,16 @@ jobs:
         shell: pwsh
         run: ./src/Casino.Games/bin/Debug/net9.0/playwright.ps1 install --with-deps
 
-      - name: Run Playwright + NUnit tests
-        run: dotnet test src/Casino.Games/Casino.Games.csproj --configuration Debug --no-build --logger "trx;LogFileName=test_results.trx"
+      - name: Run NUnit Playwright tests (${{ matrix.target }})
+        run: |
+          if [ "${{ matrix.target }}" = "desktop" ]; then
+            dotnet test src/Casino.Games/Casino.Games.csproj \
+              --configuration Debug --no-build \
+              --filter "Name~Desktop" \
+              --logger "trx;LogFileName=test_results_desktop.trx";
+          else
+            dotnet test src/Casino.Games/Casino.Games.csproj \
+              --configuration Debug --no-build \
+              --filter "Name~Mobile" \
+              --logger "trx;LogFileName=test_results_mobile.trx";
+          fi
