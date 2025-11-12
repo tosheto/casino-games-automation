@@ -37,7 +37,7 @@ namespace Casino.Games.Drivers
             });
 
             driver.Page = await driver.Context.NewPageAsync();
-            TestContext.WriteLine("[PlaywrightDriver] Created Desktop context (headed).");
+            TestContext.WriteLine($"[PlaywrightDriver] Created Desktop context (headless={headless}).");
 
             return driver;
         }
@@ -60,7 +60,7 @@ namespace Casino.Games.Drivers
             });
 
             driver.Page = await driver.Context.NewPageAsync();
-            TestContext.WriteLine("[PlaywrightDriver] Created Mobile context (iPhone 13 Pro emulation).");
+            TestContext.WriteLine($"[PlaywrightDriver] Created Mobile context (headless={headless}, device=iPhone 13 Pro).");
 
             return driver;
         }

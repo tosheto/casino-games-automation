@@ -13,7 +13,7 @@ namespace Casino.Games.Tests
         [Test]
         public async Task IrishWildsBalance_Desktop()
         {
-            await using var driver = await PlaywrightDriver.CreateDesktopAsync(headless: false);
+            await using var driver = await PlaywrightDriver.CreateDesktopAsync(headless: true);
             var game = new IrishWildsPage(driver.Page);
 
             await game.NavigateToGameAsync();
@@ -41,7 +41,7 @@ namespace Casino.Games.Tests
         [Test]
         public async Task IrishWildsBalance_Mobile()
         {
-            await using var driver = await PlaywrightDriver.CreateMobileAsync(headless: false);
+            await using var driver = await PlaywrightDriver.CreateMobileAsync(headless: true);
             var game = new IrishWildsPage(driver.Page);
 
             await game.NavigateToGameAsync();
