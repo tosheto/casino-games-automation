@@ -1,24 +1,46 @@
 # Local .NET SDK Setup
 
-In this execution environment, the .NET SDK is not preinstalled and the container does not allow downloading installers from the public internet through the default proxy. As a result, `dotnet` commands (such as `dotnet test`) fail with `command not found` until the SDK is provided manually.
+The execution environment for this kata does not ship with the .NET SDK and outbound internet access is blocked, so `dotnet`
+commands will fail until you provide the SDK yourself. Follow the steps below to stage the SDK inside the repository.
 
-To make the SDK available inside the repository, download the official `dotnet-install.sh` script and the matching SDK payloads ahead of time and commit them to the repository (or provide them through an artifact in the exercise environment). Once the script is available locally, you can install the SDK into a temporary directory (for example, `./.dotnet`) with:
+## 1. Download the installer script (outside the container if necessary)
+
+1. From a machine with internet access, download the official installer script:
+   ```bash
+   curl -o dotnet-install.sh https://dot.net/v1/dotnet-install.sh
+   ```
+2. Commit or copy the script into this repository at `scripts/dotnet-install.sh`.
+
+If you *do* have internet access where the tests run, the helper script in this repo can fetch `dotnet-install.sh` for you.
+
+## 2. Run the bootstrap script
+
+Execute the helper script which wraps the official installer and places the SDK under `./.dotnet`:
 
 ```bash
-./dotnet-install.sh --channel 8.0 --install-dir ./.dotnet
+scripts/setup-dotnet.sh
 ```
 
-After installation, expose the new SDK to the build scripts by adding the install directory to the `PATH` for each shell session where tests should be run:
+The script will download the installer (when possible) and install the latest .NET 8 SDK into `./.dotnet`.
+
+### Offline/air‑gapped environments
+If the download step fails because the environment cannot reach `https://dot.net`, manually copy `dotnet-install.sh` (and, if
+needed, the archived SDK payloads) into the repository before running `scripts/setup-dotnet.sh`. The script will reuse the local
+copy and skip the network call.
+
+## 3. Export environment variables for the new SDK
+
+For each shell session where you want to run `dotnet` commands, add the local SDK directory to your `PATH`:
 
 ```bash
 export DOTNET_ROOT="$PWD/.dotnet"
 export PATH="$DOTNET_ROOT:$PATH"
 ```
 
-The repository's test suite can then be executed with:
+To run the test suite in one command without modifying your shell configuration, you can wrap the exports inline:
 
 ```bash
 DOTNET_ROOT="$PWD/.dotnet" PATH="$DOTNET_ROOT:$PATH" dotnet test
 ```
 
-If the environment blocks outbound network traffic (as in this workspace), download the necessary script and SDK archives outside the container and copy them into the repository before running the commands above.
+Once these steps are complete, the Playwright and NUnit tests in this repository can be executed normally.
