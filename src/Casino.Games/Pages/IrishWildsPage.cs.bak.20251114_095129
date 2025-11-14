@@ -328,12 +328,6 @@ namespace Casino.Games.Pages
             );
 
             var text = await locator.InnerTextAsync(new LocatorInnerTextOptions { Timeout = 8000 });
-            text = text?.Trim();
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                TestContext.WriteLine("[IrishWildsPage] Stake text is empty – returning 0 as fallback.");
-                return 0m;
-            }
             var balance = BalanceHelper.ParseAmount(text);
             TestContext.WriteLine($"[IrishWildsPage] Balance: {balance} ({text})");
             return balance;
@@ -349,12 +343,6 @@ namespace Casino.Games.Pages
             );
 
             var text = await locator.InnerTextAsync(new LocatorInnerTextOptions { Timeout = 8000 });
-            text = text?.Trim();
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                TestContext.WriteLine("[IrishWildsPage] Stake text is empty – returning 0 as fallback.");
-                return 0m;
-            }
             var stake = BalanceHelper.ParseAmount(text);
             TestContext.WriteLine($"[IrishWildsPage] Stake per spin: {stake} ({text})");
             return stake;
@@ -423,4 +411,3 @@ namespace Casino.Games.Pages
         }
     }
 }
-
