@@ -25,7 +25,7 @@ namespace Casino.Games.Tests
             {
                 var before = await game.GetBalanceAsync();
 
-                await game.PressSpaceForSpinAsync();
+                await game.ClickSpinAsync();
                 await game.WaitForSpinToCompleteAsync(before);
 
                 var after = await game.GetBalanceAsync();
@@ -53,7 +53,7 @@ namespace Casino.Games.Tests
             {
                 var before = await game.GetBalanceAsync();
 
-                await game.PressSpaceForSpinAsync();
+                await game.ClickSpinAsync();
                 await game.WaitForSpinToCompleteAsync(before);
 
                 var after = await game.GetBalanceAsync();
@@ -67,4 +67,3 @@ namespace Casino.Games.Tests
         }
     }
 }
-

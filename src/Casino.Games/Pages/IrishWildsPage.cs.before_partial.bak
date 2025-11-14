@@ -9,7 +9,7 @@ using NUnit.Framework;
 
 namespace Casino.Games.Pages
 {
-    public partial class IrishWildsPage
+    public class IrishWildsPage
     {
         private readonly IPage _hostPage;
         private IPage _gamePage;

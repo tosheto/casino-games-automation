@@ -1,0 +1,62 @@
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Playwright;
+using NUnit.Framework;
+
+namespace Casino.Games.Pages
+{
+    public partial class IrishWildsPage
+    {
+        public async Task PressSpaceForSpinAsync()
+        {
+            TestContext.WriteLine("[IrishWildsPage] PressSpaceForSpinAsync started.");
+
+            var frame = _gameFrame ?? _gamePage.MainFrame;
+
+            // 1) Focus canvas – както ти кликаш в прозореца
+            try
+            {
+                var canvas = frame.Locator("canvas");
+                var count = await canvas.CountAsync();
+                TestContext.WriteLine($"[IrishWildsPage] Canvas count = {count}");
+
+                if (count > 0)
+                {
+                    await canvas.First.ClickAsync(new LocatorClickOptions
+                    {
+                        Force = true,
+                        Timeout = 5000
+                    });
+
+                    await _gamePage.WaitForTimeoutAsync(500);
+                }
+                else
+                {
+                    TestContext.WriteLine("[IrishWildsPage] No <canvas> found for focus.");
+                }
+            }
+            catch (Exception ex)
+            {
+                TestContext.WriteLine($"[IrishWildsPage] Canvas focus error: {ex.Message}");
+            }
+
+            // 2) Същият JS, който работи в DevTools конзолата
+            const string js =
+                "document.dispatchEvent(new KeyboardEvent('keydown', {key:' ', code:'Space', keyCode:32, which:32, bubbles:true}));" +
+                "document.dispatchEvent(new KeyboardEvent('keyup',   {key:' ', code:'Space', keyCode:32, which:32, bubbles:true}));";
+
+            try
+            {
+                await frame.EvaluateAsync(js);
+                TestContext.WriteLine("[IrishWildsPage] JS Space injection executed.");
+            }
+            catch (Exception ex)
+            {
+                TestContext.WriteLine($"[IrishWildsPage] JS injection failed: {ex.Message}");
+            }
+
+            await _gamePage.WaitForTimeoutAsync(3000);
+            TestContext.WriteLine("[IrishWildsPage] PressSpaceForSpinAsync finished.");
+        }
+    }
+}
