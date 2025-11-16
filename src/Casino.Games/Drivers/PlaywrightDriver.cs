@@ -16,14 +16,33 @@ namespace Casino.Games.Drivers
 
         private PlaywrightDriver() { }
 
+        private static bool ResolveHeadless(bool requestedHeadless)
+        {
+            // In GitHub Actions there is no X server, so we must run headless
+            var inCi = string.Equals(
+                Environment.GetEnvironmentVariable("GITHUB_ACTIONS"),
+                "true",
+                StringComparison.OrdinalIgnoreCase);
+
+            if (inCi)
+            {
+                return true;
+            }
+
+            return requestedHeadless;
+        }
+
         public static async Task<PlaywrightDriver> CreateDesktopAsync(bool headless)
         {
             var driver = new PlaywrightDriver();
 
             driver.Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
+
+            var headlessFinal = ResolveHeadless(headless);
+
             driver.Browser = await driver.Playwright.Chromium.LaunchAsync(new()
             {
-                Headless = headless,
+                Headless = headlessFinal,
             });
 
             driver.Context = await driver.Browser.NewContextAsync(new()
@@ -37,7 +56,8 @@ namespace Casino.Games.Drivers
             });
 
             driver.Page = await driver.Context.NewPageAsync();
-            TestContext.WriteLine("[PlaywrightDriver] Created Desktop context (headed).");
+            var mode = headlessFinal ? "headless" : "headed";
+            TestContext.WriteLine($"[PlaywrightDriver] Created Desktop context ({mode}).");
 
             return driver;
         }
@@ -49,9 +69,11 @@ namespace Casino.Games.Drivers
             driver.Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
             var device = driver.Playwright.Devices["iPhone 13 Pro"];
 
+            var headlessFinal = ResolveHeadless(headless);
+
             driver.Browser = await driver.Playwright.Chromium.LaunchAsync(new()
             {
-                Headless = headless,
+                Headless = headlessFinal,
             });
 
             driver.Context = await driver.Browser.NewContextAsync(new BrowserNewContextOptions(device)
@@ -60,7 +82,8 @@ namespace Casino.Games.Drivers
             });
 
             driver.Page = await driver.Context.NewPageAsync();
-            TestContext.WriteLine("[PlaywrightDriver] Created Mobile context (iPhone 13 Pro emulation).");
+            var mode = headlessFinal ? "headless" : "headed";
+            TestContext.WriteLine($"[PlaywrightDriver] Created Mobile context (iPhone 13 Pro emulation, {mode}).");
 
             return driver;
         }
