@@ -26,14 +26,14 @@ namespace Casino.Games.Pages
         {
             try
             {
-                // 1) Spinberry products
+                // 1) Navigate to Spinberry products page
                 await _hostPage.GotoAsync(TestSettings.BaseUrl, new PageGotoOptions
                 {
                     WaitUntil = WaitUntilState.NetworkIdle
                 });
                 TestContext.WriteLine($"[IrishWildsPage] Navigated to products: {TestSettings.BaseUrl}");
 
-                // 2) Cookies
+                // 2) Accept cookies if present
                 try
                 {
                     var agree = _hostPage.Locator("text=I agree");
@@ -48,11 +48,11 @@ namespace Casino.Games.Pages
                     TestContext.WriteLine($"[IrishWildsPage] Cookie banner error: {ex.Message}");
                 }
 
-                // 3) Scroll към Irish Wilds
+                // 3) Scroll towards the Irish Wilds section
                 await _hostPage.EvaluateAsync("window.scrollBy(0, document.body.scrollHeight / 2);");
                 await _hostPage.WaitForTimeoutAsync(1500);
 
-                // 4) 'Play game' линк за Irish Wilds
+                // 4) 'Play game' link for Irish Wilds
                 var playLink = _hostPage.Locator(
                     "xpath=//h4[normalize-space()='Irish Wilds']/following::a[contains(@class,'showreel') and contains(@class,'play')][1]"
                 );
@@ -70,7 +70,7 @@ namespace Casino.Games.Pages
 
                 try
                 {
-                    // Хващаме popup (target=_blank), ако има
+                    // Try to capture popup (target=_blank), if any
                     newPage = await _hostPage.Context.RunAndWaitForPageAsync(async () =>
                     {
                         await playLink.First.ClickAsync(new LocatorClickOptions
@@ -100,7 +100,7 @@ namespace Casino.Games.Pages
                 }
                 else
                 {
-                    // fallback към директното демо URL
+                    // Fallback to the direct demo GameUrl
                     TestContext.WriteLine("[IrishWildsPage] Navigating to fallback GameUrl.");
                     await _hostPage.GotoAsync(TestSettings.GameUrl, new PageGotoOptions
                     {
@@ -112,11 +112,11 @@ namespace Casino.Games.Pages
                 await _gamePage.WaitForLoadStateAsync(LoadState.NetworkIdle);
                 TestContext.WriteLine($"[IrishWildsPage] On game host page: {_gamePage.Url}");
 
-                // 5) Намери frame (ако има)
+                // 5) Detect game frame (if any)
                 _gameFrame = await DetectGameFrameAsync();
                 TestContext.WriteLine($"[IrishWildsPage] Initial game frame: {_gameFrame.Url}");
 
-                // 6) Жълт Play + чакаме истинската игра
+                // 6) Intro Play and wait for actual game UI (balance + spin)
                 await WaitForGameLoadedAsync();
             }
             catch (Exception ex)
@@ -179,17 +179,17 @@ namespace Casino.Games.Pages
         private async Task WaitForGameLoadedAsync()
         {
             var ctx = _gamePage.Context;
-            var deadline = DateTime.UtcNow.AddSeconds(50);
+            var deadline = DateTime.UtcNow.AddSeconds(20);
             var introTried = false;
 
             while (DateTime.UtcNow < deadline)
             {
                 try
                 {
-                    // 1) Ако сме на зеления екран – цъкай жълтия Play
+                    // 1) If we are on the intro (green) screen – click the yellow Play button once
                     if (!introTried)
                     {
-                        // Точният бутон:
+                        // Exact intro button:
                         // <button type="button" class="button button__slider-play button__rounded-xl _visible">
                         var introBtnPage = _gamePage.Locator("button.button__slider-play.button__rounded-xl._visible");
                         var introBtnFrame = _gameFrame.Locator("button.button__slider-play.button__rounded-xl._visible");
@@ -205,56 +205,35 @@ namespace Casino.Games.Pages
                         {
                             TestContext.WriteLine("[IrishWildsPage] Intro Play button found. Clicking...");
 
-                            IPage newPage = null;
-
                             try
                             {
-                                // Опитваме popup след жълтия Play
-                                newPage = await ctx.RunAndWaitForPageAsync(async () =>
+                                await introBtn.ClickAsync(new LocatorClickOptions
                                 {
-                                    await introBtn.ClickAsync(new LocatorClickOptions
-                                    {
-                                        Force = true,
-                                        Timeout = 8000
-                                    });
-                                }, new()
-                                {
-                                    Timeout = 15000
+                                    Force = true,
+                                    Timeout = 5000
                                 });
-
-                                TestContext.WriteLine($"[IrishWildsPage] New page after intro Play: {newPage.Url}");
                             }
-                            catch
+                            catch (Exception ex)
                             {
-                                // Ако няма нов таб – чакаме навигация в същия
-                                TestContext.WriteLine("[IrishWildsPage] No popup after intro Play, waiting for navigation...");
-                                try
-                                {
-                                    await _gamePage.WaitForNavigationAsync(new()
-                                    {
-                                        Timeout = 15000,
-                                        WaitUntil = WaitUntilState.NetworkIdle
-                                    });
-                                }
-                                catch (Exception ex)
-                                {
-                                    TestContext.WriteLine($"[IrishWildsPage] WaitForNavigation after intro Play failed: {ex.Message}");
-                                }
+                                TestContext.WriteLine($"[IrishWildsPage] Intro Play click failed (continuing anyway): {ex.Message}");
                             }
 
                             introTried = true;
 
-                            if (newPage != null)
-                                _gamePage = newPage;
+                            // Give the game a short moment to transition, then re-detect frame
+                            try
+                            {
+                                await _gamePage.WaitForTimeoutAsync(1000);
+                            }
+                            catch { }
 
-                            // след click/redirect преоткриваме game frame
                             _gameFrame = await DetectGameFrameAsync();
-                            await _gamePage.WaitForLoadStateAsync(LoadState.NetworkIdle);
+                            await _gamePage.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
                             continue;
                         }
                     }
 
-                    // 2) Проверка за real game UI (balance + spin)
+                    // 2) Check for real game UI (balance + spin) in the current frame
                     var balCount = await _gameFrame.Locator(TestSettings.Selectors.BalanceLabelCss).CountAsync();
                     var spinCount = await _gameFrame.Locator(TestSettings.Selectors.SpinButtonCss).CountAsync();
 
@@ -264,12 +243,12 @@ namespace Casino.Games.Pages
                         return;
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // игнорираме и опитваме пак
+                    TestContext.WriteLine($"[IrishWildsPage] WaitForGameLoadedAsync iteration error: {ex.Message}");
                 }
 
-                await _gamePage.WaitForTimeoutAsync(500);
+                await _gamePage.WaitForTimeoutAsync(300);
             }
 
             await DumpGameFrameHtmlAsync("GameNotLoaded");
@@ -331,7 +310,7 @@ namespace Casino.Games.Pages
             text = text?.Trim();
             if (string.IsNullOrWhiteSpace(text))
             {
-                TestContext.WriteLine("[IrishWildsPage] Stake text is empty – returning 0 as fallback.");
+                TestContext.WriteLine("[IrishWildsPage] Balance text is empty – returning 0 as fallback.");
                 return 0m;
             }
             var balance = BalanceHelper.ParseAmount(text);
@@ -423,4 +402,3 @@ namespace Casino.Games.Pages
         }
     }
 }
-
