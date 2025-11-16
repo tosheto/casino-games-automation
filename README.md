@@ -92,12 +92,9 @@ Inside a loop, until the deadline:
 Call GetBalanceAsync() to read the current balance from the UI.
 If currentBalance != previousBalance, log:
 [IrishWildsPage] Balance changed. Spin complete.
-
-
 and return.
 
 Otherwise, wait a small interval and try again.
-
 If the deadline is reached without a change:
 
 [IrishWildsPage] Spin wait timeout reached.
