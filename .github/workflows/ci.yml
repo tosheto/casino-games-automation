@@ -36,8 +36,10 @@ jobs:
         shell: pwsh
         run: ./src/Casino.Games/bin/Debug/net9.0/playwright.ps1 install --with-deps
 
+      # Run tests and generate Allure results
       - name: Run NUnit Playwright tests (${{ matrix.target }})
         run: |
+          set -e
           if [ "${{ matrix.target }}" = "desktop" ]; then
             dotnet test src/Casino.Games/Casino.Games.csproj \
               --configuration Debug --no-build \
@@ -49,3 +51,42 @@ jobs:
               --filter "Name~Mobile" \
               --logger "trx;LogFileName=test_results_mobile.trx";
           fi
+
+      # Upload TRX test results as artifact (raw test evidence)
+      - name: Upload TRX results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trx-results-${{ matrix.target }}
+          path: |
+            **/test_results_desktop.trx
+            **/test_results_mobile.trx
+          if-no-files-found: ignore
+
+      # Upload Allure raw results (assuming tests write to ./allure-results)
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ matrix.target }}
+          path: |
+            **/allure-results
+          if-no-files-found: ignore
+
+      # Generate Allure HTML report from results (if present)
+      - name: Install Allure CLI
+        if: always()
+        uses: simple-elf/allure-report-action@v1.7
+        with:
+          allure_results: ./allure-results
+          allure_report: ./allure-report
+          keep_reports: 1
+
+      # Upload Allure HTML report as artifact (for download & local viewing)
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-${{ matrix.target }}
+          path: ./allure-report
+          if-no-files-found: ignore
