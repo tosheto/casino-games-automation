@@ -12,6 +12,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         target: [ desktop, mobile ]
 
@@ -36,10 +37,8 @@ jobs:
         shell: pwsh
         run: ./src/Casino.Games/bin/Debug/net9.0/playwright.ps1 install --with-deps
 
-      # Run tests and generate Allure results
       - name: Run NUnit Playwright tests (${{ matrix.target }})
         run: |
-          set -e
           if [ "${{ matrix.target }}" = "desktop" ]; then
             dotnet test src/Casino.Games/Casino.Games.csproj \
               --configuration Debug --no-build \
@@ -52,7 +51,6 @@ jobs:
               --logger "trx;LogFileName=test_results_mobile.trx";
           fi
 
-      # Upload TRX test results as artifact (raw test evidence)
       - name: Upload TRX results
         if: always()
         uses: actions/upload-artifact@v4
@@ -61,32 +59,30 @@ jobs:
           path: |
             **/test_results_desktop.trx
             **/test_results_mobile.trx
-          if-no-files-found: ignore
 
-      # Upload Allure raw results (assuming tests write to ./allure-results)
-      - name: Upload Allure results
+      - name: Upload Allure raw results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-${{ matrix.target }}
           path: |
             **/allure-results
-          if-no-files-found: ignore
 
-      # Generate Allure HTML report from results (if present)
       - name: Install Allure CLI
-        if: always()
-        uses: simple-elf/allure-report-action@v1.7
-        with:
-          allure_results: ./allure-results
-          allure_report: ./allure-report
-          keep_reports: 1
+        if: always() && hashFiles('**/allure-results/**') != ''
+        run: |
+          npm install -g allure-commandline@2.29.0 --save-dev
 
-      # Upload Allure HTML report as artifact (for download & local viewing)
+      - name: Generate Allure HTML report
+        if: always() && hashFiles('**/allure-results/**') != ''
+        run: |
+          # assume allure-results is at repo root; if not, Allure will still
+          # pick it up from default location used by the adapter
+          allure generate allure-results --clean -o allure-report
+
       - name: Upload Allure HTML report
-        if: always()
+        if: always() && hashFiles('allure-report/**') != ''
         uses: actions/upload-artifact@v4
         with:
           name: allure-report-${{ matrix.target }}
-          path: ./allure-report
-          if-no-files-found: ignore
+          path: allure-report
