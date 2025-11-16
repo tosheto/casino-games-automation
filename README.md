@@ -54,7 +54,8 @@ The relevant parts of the solution are organized as follows:
 └─ .github/
    └─ workflows/
       └─ ci.yml
-
+```text
+. 
 Triggering spins using the space key
 
 The method PressSpaceForSpinAsync encapsulates how a spin is triggered:
