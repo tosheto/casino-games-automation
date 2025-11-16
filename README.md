@@ -46,7 +46,9 @@ The relevant parts of the solution are organized as follows:
    └─ workflows/
       └─ ci.yml
 ---
-## Prerequisites
+
+
+- **Prerequisites
 Before you run the tests locally, make sure you have: .NET SDK 9.0 (or later) installed
 You can verify with:
 dotnet --version
