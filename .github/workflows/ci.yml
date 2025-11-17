@@ -65,6 +65,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-${{ matrix.target }}
+          # Качваме всички директории "allure-results" от билда
           path: "**/allure-results"
           if-no-files-found: error
 
@@ -84,6 +85,24 @@ jobs:
           merge-multiple: true
           path: allure-results
 
+      - name: Show downloaded structure (debug)
+        run: |
+          echo "Downloaded artifacts:"
+          ls -R
+
+      # ⚠️ Тук събираме всички намерени allure-results в една плоска директория
+      - name: Merge Allure results from all runs
+        run: |
+          mkdir -p merged-allure-results
+          # намираме всички директории с име "allure-results" и копираме съдържанието им
+          for dir in $(find allure-results -type d -name "allure-results"); do
+            echo "Merging results from: $dir"
+            cp -R "$dir"/. merged-allure-results/
+          done
+
+          echo "Merged Allure results content:"
+          ls -R merged-allure-results
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -96,8 +115,9 @@ jobs:
 
       - name: Generate Allure report
         run: |
-          ls -R
-          allure generate allure-results -o allure-report --clean
+          allure generate merged-allure-results -o allure-report --clean
+          echo "Generated Allure report structure:"
+          ls -R allure-report
 
       - name: Deploy Allure report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
