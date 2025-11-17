@@ -1,4 +1,4 @@
-﻿name: CI - Casino.Games Desktop & Mobile
+name: CI - Casino.Games Desktop & Mobile
 
 on:
   push:
@@ -42,12 +42,12 @@ jobs:
             dotnet test src/Casino.Games/Casino.Games.csproj \
               --configuration Debug --no-build \
               --filter "Name~Desktop" \
-              --logger "trx;LogFileName=desktop.trx";
+              --logger "trx;LogFileName=test_results_desktop.trx";
           else
             dotnet test src/Casino.Games/Casino.Games.csproj \
               --configuration Debug --no-build \
               --filter "Name~Mobile" \
-              --logger "trx;LogFileName=mobile.trx";
+              --logger "trx;LogFileName=test_results_mobile.trx";
           fi
 
       - name: Upload TRX results
@@ -55,16 +55,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: trx-results-${{ matrix.target }}
-          path: src/Casino.Games/TestResults/**/*.trx
+          path: src/Casino.Games/TestResults/*.trx
           if-no-files-found: error
 
-      # 🔽 ТУК Е ГЛАВНАТА ПРОМЯНА 🔽
       - name: Upload Allure results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-${{ matrix.target }}
-          # ЛОКАЛНО Allure пише в ./allure-results -> същото и в CI
           path: allure-results
           if-no-files-found: error
 
@@ -84,11 +82,14 @@ jobs:
           merge-multiple: true
           path: allure-results
 
-      - name: Install Allure CLI (Debian package)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Allure CLI (npm)
         run: |
-          sudo apt-add-repository ppa:qameta/allure -y
-          sudo apt-get update
-          sudo apt-get install allure -y
+          npm install -g allure-commandline --unsafe-perm
           allure --version
 
       - name: Generate Allure report
@@ -100,6 +101,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: allure-report
+          publish_dir: ./allure-report
           publish_branch: gh-pages
           force_orphan: true
