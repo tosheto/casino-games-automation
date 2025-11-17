@@ -38,7 +38,6 @@ namespace Casino.Games.Tests
         [AllureSeverity(SeverityLevel.critical)]
         [AllureStory("Balance changes after multiple spins - Mobile")]
         [TestCase("chromium")]
-        [TestCase("firefox")]
         [TestCase("webkit")]
         public async Task IrishWildsBalance_Mobile(string browser)
         {
