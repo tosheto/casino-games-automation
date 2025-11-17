@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Casino.Games.Configuration;
 using Microsoft.Playwright;
@@ -8,10 +8,10 @@ namespace Casino.Games.Drivers
 {
     public class PlaywrightDriver : IAsyncDisposable
     {
-        public IPlaywright Playwright { get; private set; }
-        public IBrowser Browser { get; private set; }
-        public IBrowserContext Context { get; private set; }
-        public IPage Page { get; private set; }
+        public IPlaywright Playwright { get; private set; } = default!;
+        public IBrowser Browser { get; private set; } = default!;
+        public IBrowserContext Context { get; private set; } = default!;
+        public IPage Page { get; private set; } = default!;
 
         private PlaywrightDriver() { }
 
@@ -27,35 +27,41 @@ namespace Casino.Games.Drivers
 
         private static IBrowserType ResolveBrowserType(IPlaywright playwright, string browserName)
         {
-            switch (browserName?.ToLowerInvariant())
+            return browserName?.ToLowerInvariant() switch
             {
-                case "firefox":
-                    return playwright.Firefox;
-                case "webkit":
-                    return playwright.Webkit;
-                default:
-                    return playwright.Chromium;
-            }
+                "firefox" => playwright.Firefox,
+                "webkit"  => playwright.Webkit,
+                _         => playwright.Chromium
+            };
         }
 
         public static async Task<PlaywrightDriver> CreateDesktopAsync(string browser, bool headless)
         {
             var driver = new PlaywrightDriver();
-            driver.Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
 
+            driver.Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
             var headlessFinal = ResolveHeadless(headless);
             var browserType = ResolveBrowserType(driver.Playwright, browser);
 
-            driver.Browser = await browserType.LaunchAsync(new() { Headless = headlessFinal });
+            driver.Browser = await browserType.LaunchAsync(new()
+            {
+                Headless = headlessFinal
+            });
 
             driver.Context = await driver.Browser.NewContextAsync(new()
             {
-                ViewportSize = new ViewportSize { Width = 1366, Height = 540 },
+                ViewportSize = new ViewportSize
+                {
+                    Width = 1366,
+                    Height = 540
+                },
                 RecordVideoDir = TestSettings.VideoOutputDir
             });
 
             driver.Page = await driver.Context.NewPageAsync();
-            TestContext.WriteLine($"[PlaywrightDriver] Desktop ({browser}) mode: {(headlessFinal ? "headless" : "headed")}");
+
+            var mode = headlessFinal ? "headless" : "headed";
+            TestContext.WriteLine($"[PlaywrightDriver] Created Desktop context ({browser}, {mode}).");
 
             return driver;
         }
@@ -63,29 +69,53 @@ namespace Casino.Games.Drivers
         public static async Task<PlaywrightDriver> CreateMobileAsync(string browser, bool headless)
         {
             var driver = new PlaywrightDriver();
-            driver.Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
 
+            driver.Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
             var device = driver.Playwright.Devices["iPhone 13 Pro"];
+
             var headlessFinal = ResolveHeadless(headless);
             var browserType = ResolveBrowserType(driver.Playwright, browser);
 
-            driver.Browser = await browserType.LaunchAsync(new() { Headless = headlessFinal });
-
-            driver.Context = await driver.Browser.NewContextAsync(new BrowserNewContextOptions(device)
+            driver.Browser = await browserType.LaunchAsync(new()
             {
-                RecordVideoDir = TestSettings.VideoOutputDir
+                Headless = headlessFinal
             });
 
+            driver.Context = await driver.Browser.NewContextAsync(
+                new BrowserNewContextOptions(device)
+                {
+                    RecordVideoDir = TestSettings.VideoOutputDir
+                });
+
             driver.Page = await driver.Context.NewPageAsync();
-            TestContext.WriteLine($"[PlaywrightDriver] Mobile ({browser}) iPhone 13 mode: {(headlessFinal ? "headless" : "headed")}");
+
+            var mode = headlessFinal ? "headless" : "headed";
+            TestContext.WriteLine($"[PlaywrightDriver] Created Mobile context ({browser}, iPhone 13 Pro emulation, {mode}).");
 
             return driver;
         }
 
         public async ValueTask DisposeAsync()
         {
-            try { if (Context != null) await Context.CloseAsync(); } catch { }
-            try { if (Browser != null) await Browser.CloseAsync(); } catch { }
+            try
+            {
+                if (Context != null)
+                    await Context.CloseAsync();
+            }
+            catch (Exception ex)
+            {
+                TestContext.WriteLine($"[PlaywrightDriver] Error closing context: {ex.Message}");
+            }
+
+            try
+            {
+                if (Browser != null)
+                    await Browser.CloseAsync();
+            }
+            catch (Exception ex)
+            {
+                TestContext.WriteLine($"[PlaywrightDriver] Error closing browser: {ex.Message}");
+            }
 
             Playwright?.Dispose();
         }

@@ -1,9 +1,10 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Casino.Games.Drivers;
 using Casino.Games.Pages;
 using NUnit.Framework;
 using Allure.NUnit;
 using Allure.NUnit.Attributes;
+using Allure.Net.Commons;
 
 namespace Casino.Games.Tests
 {
@@ -11,105 +12,109 @@ namespace Casino.Games.Tests
     [AllureNUnit]
     [AllureEpic("Casino Games")]
     [AllureFeature("Irish Wilds")]
-    [AllureSuite("Balance & win/loss validation")]
+    [AllureSuite("Irish Wilds")]
+    [AllureSubSuite("Balance & win/loss validation")]
     public class IrishWildsBalanceTests
     {
         private const int SpinsToPlay = 5;
 
-        private static readonly string[] Browsers = new[]
-        {
-            "chromium",
-            "firefox",
-            "webkit"
-        };
-
-        // =======================
-        // DESKTOP
-        // =======================
         [Test]
-        [TestCaseSource(nameof(Browsers))]
-        [AllureSubSuite("Desktop")]
+        [Category("desktop")]
+        [AllureSuite("Desktop")]
         [AllureSeverity(SeverityLevel.critical)]
-        [AllureStory("Balance changes after multiple spins (Desktop)")]
+        [AllureStory("Balance changes after multiple spins - Desktop")]
+        [TestCase("chromium")]
+        [TestCase("firefox")]
+        [TestCase("webkit")]
         public async Task IrishWildsBalance_Desktop(string browser)
         {
             await using var driver = await PlaywrightDriver.CreateDesktopAsync(browser, headless: false);
-            var game = new IrishWildsPage(driver.Page);
-
-            await Step_OpenGame(game, browser, "desktop");
-
-            var initialBalance = await Step_GetBalance(game, "initial");
-            var stake = await Step_GetStake(game);
-
-            var lastBalance = initialBalance;
-
-            for (int i = 0; i < SpinsToPlay; i++)
-                await Step_Spin(game, i + 1, ref lastBalance);
-
-            await Step_AssertBalanceChanged(initialBalance, lastBalance);
+            await RunBalanceScenarioAsync("desktop", browser, driver);
         }
 
-        // =======================
-        // MOBILE
-        // =======================
         [Test]
-        [TestCaseSource(nameof(Browsers))]
-        [AllureSubSuite("Mobile")]
+        [Category("mobile")]
+        [AllureSuite("Mobile")]
         [AllureSeverity(SeverityLevel.critical)]
-        [AllureStory("Balance changes after multiple spins (Mobile)")]
+        [AllureStory("Balance changes after multiple spins - Mobile")]
+        [TestCase("chromium")]
+        [TestCase("firefox")]
+        [TestCase("webkit")]
         public async Task IrishWildsBalance_Mobile(string browser)
         {
             await using var driver = await PlaywrightDriver.CreateMobileAsync(browser, headless: false);
-            var game = new IrishWildsPage(driver.Page);
-
-            await Step_OpenGame(game, browser, "mobile");
-
-            var initialBalance = await Step_GetBalance(game, "initial");
-            var stake = await Step_GetStake(game);
-
-            var lastBalance = initialBalance;
-
-            for (int i = 0; i < SpinsToPlay; i++)
-                await Step_Spin(game, i + 1, ref lastBalance);
-
-            await Step_AssertBalanceChanged(initialBalance, lastBalance);
+            await RunBalanceScenarioAsync("mobile", browser, driver);
         }
 
-        // =======================
-        // ALLURE STEPS
-        // =======================
+        [AllureStep("Run Irish Wilds balance scenario on {0} / {1}")]
+        private async Task RunBalanceScenarioAsync(string platform, string browser, PlaywrightDriver driver)
+        {
+            var game = new IrishWildsPage(driver.Page);
 
-        [AllureStep("Open Irish Wilds in {mode} mode with {browser}")]
-        private async Task Step_OpenGame(IrishWildsPage game, string browser, string mode)
+            await OpenGameAsync(platform, browser, game);
+
+            var initialBalance = await GetInitialBalanceAsync(platform, browser, game);
+            var finalBalance = await SpinAndGetFinalBalanceAsync(platform, browser, SpinsToPlay, game, initialBalance);
+
+            await VerifyBalanceChangedAsync(platform, browser, initialBalance, finalBalance);
+        }
+
+        [AllureStep("Open Irish Wilds game ({0} / {1})")]
+        private async Task OpenGameAsync(string platform, string browser, IrishWildsPage game)
         {
             await game.NavigateToGameAsync();
         }
 
-        [AllureStep("Get {description} balance")]
-        private async Task<decimal> Step_GetBalance(IrishWildsPage game, string description)
+        [AllureStep("Read initial balance ({0} / {1})")]
+        private async Task<decimal> GetInitialBalanceAsync(string platform, string browser, IrishWildsPage game)
         {
-            return await game.GetBalanceAsync();
+            var initialBalance = await game.GetBalanceAsync();
+            var stake = await game.GetStakePerSpinAsync();
+
+            TestContext.WriteLine(
+                $"[IrishWildsBalance_{platform}] ({browser}) Initial balance: {initialBalance}, stake: {stake}");
+
+            return initialBalance;
         }
 
-        [AllureStep("Get stake per spin")]
-        private async Task<decimal> Step_GetStake(IrishWildsPage game)
+        [AllureStep("Spin {2} times and track balance ({0} / {1})")]
+        private async Task<decimal> SpinAndGetFinalBalanceAsync(
+            string platform,
+            string browser,
+            int spinsToPlay,
+            IrishWildsPage game,
+            decimal initialBalance)
         {
-            return await game.GetStakePerSpinAsync();
+            var lastBalance = initialBalance;
+
+            for (int i = 0; i < spinsToPlay; i++)
+            {
+                var before = await game.GetBalanceAsync();
+
+                await game.PressSpaceForSpinAsync();
+                await game.WaitForSpinToCompleteAsync(before);
+
+                var after = await game.GetBalanceAsync();
+
+                TestContext.WriteLine(
+                    $"[IrishWildsBalance_{platform}] ({browser}) Spin {i + 1}: before={before}, after={after}");
+
+                lastBalance = after;
+            }
+
+            return lastBalance;
         }
 
-        [AllureStep("Spin #{spinNumber}")]
-        private async Task Step_Spin(IrishWildsPage game, int spinNumber, ref decimal lastBalance)
+        [AllureStep("Verify balance changed from {2} to {3} ({0} / {1})")]
+        private Task VerifyBalanceChangedAsync(
+            string platform,
+            string browser,
+            decimal initialBalance,
+            decimal finalBalance)
         {
-            var before = await game.GetBalanceAsync();
-            await game.PressSpaceForSpinAsync();
-            await game.WaitForSpinToCompleteAsync(before);
-            lastBalance = await game.GetBalanceAsync();
-        }
+            Assert.That(finalBalance, Is.Not.EqualTo(initialBalance),
+                $"[{platform}] ({browser}) Balance should change after multiple spins.");
 
-        [AllureStep("Validate balance changed")]
-        private Task Step_AssertBalanceChanged(decimal initial, decimal final)
-        {
-            Assert.That(final, Is.Not.EqualTo(initial), "Balance should change after spins.");
             return Task.CompletedTask;
         }
     }

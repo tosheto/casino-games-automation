@@ -1,14 +1,10 @@
-name: CI - Casino.Games Desktop & Mobile
+﻿name: CI - Casino.Games Desktop & Mobile
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
-# 🔑 ДАВАМЕ WRITE ПРАВА НА GITHUB_TOKEN, за да може да push-ва към gh-pages
-permissions:
-  contents: write
 
 jobs:
   test:
@@ -45,13 +41,15 @@ jobs:
           if [ "${{ matrix.target }}" = "desktop" ]; then
             dotnet test src/Casino.Games/Casino.Games.csproj \
               --configuration Debug --no-build \
-              --filter "Name~Desktop" \
-              --logger "trx;LogFileName=test_results_desktop.trx";
+              --filter "TestCategory=desktop" \
+              --logger "trx;LogFileName=desktop.trx" \
+              --results-directory "src/Casino.Games/TestResults/desktop";
           else
             dotnet test src/Casino.Games/Casino.Games.csproj \
               --configuration Debug --no-build \
-              --filter "Name~Mobile" \
-              --logger "trx;LogFileName=test_results_mobile.trx";
+              --filter "TestCategory=mobile" \
+              --logger "trx;LogFileName=mobile.trx" \
+              --results-directory "src/Casino.Games/TestResults/mobile";
           fi
 
       - name: Upload TRX results
@@ -59,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: trx-results-${{ matrix.target }}
-          path: src/Casino.Games/TestResults/*.trx
+          path: src/Casino.Games/TestResults/${{ matrix.target }}/*.trx
           if-no-files-found: error
 
       - name: Upload Allure results
@@ -67,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-${{ matrix.target }}
-          path: allure-results
+          path: "**/allure-results"
           if-no-files-found: error
 
   allure-report:
