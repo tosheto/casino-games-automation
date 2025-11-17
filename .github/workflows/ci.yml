@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+# 🔑 ДАВАМЕ WRITE ПРАВА НА GITHUB_TOKEN, за да може да push-ва към gh-pages
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
