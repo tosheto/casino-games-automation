@@ -1,89 +1,116 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Casino.Games.Drivers;
 using Casino.Games.Pages;
 using NUnit.Framework;
-using Allure.NUnit.Attributes;
 using Allure.NUnit;
-
+using Allure.NUnit.Attributes;
 
 namespace Casino.Games.Tests
 {
     [TestFixture]
     [AllureNUnit]
-    [AllureSuite("Irish Wilds")]
-    [AllureFeature("Balance & win/loss validation")]
+    [AllureEpic("Casino Games")]
+    [AllureFeature("Irish Wilds")]
+    [AllureSuite("Balance & win/loss validation")]
     public class IrishWildsBalanceTests
     {
         private const int SpinsToPlay = 5;
 
-        [Test]
-        public async Task IrishWildsBalance_Desktop()
+        private static readonly string[] Browsers = new[]
         {
-            await using var driver = await PlaywrightDriver.CreateDesktopAsync(headless: false);
+            "chromium",
+            "firefox",
+            "webkit"
+        };
+
+        // =======================
+        // DESKTOP
+        // =======================
+        [Test]
+        [TestCaseSource(nameof(Browsers))]
+        [AllureSubSuite("Desktop")]
+        [AllureSeverity(SeverityLevel.critical)]
+        [AllureStory("Balance changes after multiple spins (Desktop)")]
+        public async Task IrishWildsBalance_Desktop(string browser)
+        {
+            await using var driver = await PlaywrightDriver.CreateDesktopAsync(browser, headless: false);
             var game = new IrishWildsPage(driver.Page);
 
-            await game.NavigateToGameAsync();
+            await Step_OpenGame(game, browser, "desktop");
 
-            var initialBalance = await game.GetBalanceAsync();
-            var stake = await game.GetStakePerSpinAsync();
-
-            TestContext.WriteLine(
-                $"[IrishWildsBalance_Desktop] Initial balance: {initialBalance}, stake: {stake}");
+            var initialBalance = await Step_GetBalance(game, "initial");
+            var stake = await Step_GetStake(game);
 
             var lastBalance = initialBalance;
 
             for (int i = 0; i < SpinsToPlay; i++)
-            {
-                var before = await game.GetBalanceAsync();
+                await Step_Spin(game, i + 1, ref lastBalance);
 
-                await game.PressSpaceForSpinAsync();
-                await game.WaitForSpinToCompleteAsync(before);
-
-                var after = await game.GetBalanceAsync();
-                TestContext.WriteLine(
-                    $"[IrishWildsBalance_Desktop] Spin {i + 1}: before={before}, after={after}");
-
-                lastBalance = after;
-            }
-
-            var finalBalance = lastBalance;
-            Assert.That(finalBalance, Is.Not.EqualTo(initialBalance),
-                "Balance should change after multiple spins.");
+            await Step_AssertBalanceChanged(initialBalance, lastBalance);
         }
 
+        // =======================
+        // MOBILE
+        // =======================
         [Test]
-        public async Task IrishWildsBalance_Mobile()
+        [TestCaseSource(nameof(Browsers))]
+        [AllureSubSuite("Mobile")]
+        [AllureSeverity(SeverityLevel.critical)]
+        [AllureStory("Balance changes after multiple spins (Mobile)")]
+        public async Task IrishWildsBalance_Mobile(string browser)
         {
-            await using var driver = await PlaywrightDriver.CreateMobileAsync(headless: false);
+            await using var driver = await PlaywrightDriver.CreateMobileAsync(browser, headless: false);
             var game = new IrishWildsPage(driver.Page);
 
-            await game.NavigateToGameAsync();
+            await Step_OpenGame(game, browser, "mobile");
 
-            var initialBalance = await game.GetBalanceAsync();
-            var stake = await game.GetStakePerSpinAsync();
-
-            TestContext.WriteLine(
-                $"[IrishWildsBalance_Mobile] Initial balance: {initialBalance}, stake: {stake}");
+            var initialBalance = await Step_GetBalance(game, "initial");
+            var stake = await Step_GetStake(game);
 
             var lastBalance = initialBalance;
 
             for (int i = 0; i < SpinsToPlay; i++)
-            {
-                var before = await game.GetBalanceAsync();
+                await Step_Spin(game, i + 1, ref lastBalance);
 
-                await game.PressSpaceForSpinAsync();
-                await game.WaitForSpinToCompleteAsync(before);
+            await Step_AssertBalanceChanged(initialBalance, lastBalance);
+        }
 
-                var after = await game.GetBalanceAsync();
-                TestContext.WriteLine(
-                    $"[IrishWildsBalance_Mobile] Spin {i + 1}: before={before}, after={after}");
+        // =======================
+        // ALLURE STEPS
+        // =======================
 
-                lastBalance = after;
-            }
+        [AllureStep("Open Irish Wilds in {mode} mode with {browser}")]
+        private async Task Step_OpenGame(IrishWildsPage game, string browser, string mode)
+        {
+            await game.NavigateToGameAsync();
+        }
 
-            var finalBalance = lastBalance;
-            Assert.That(finalBalance, Is.Not.EqualTo(initialBalance),
-                "Balance should change after multiple spins.");
+        [AllureStep("Get {description} balance")]
+        private async Task<decimal> Step_GetBalance(IrishWildsPage game, string description)
+        {
+            return await game.GetBalanceAsync();
+        }
+
+        [AllureStep("Get stake per spin")]
+        private async Task<decimal> Step_GetStake(IrishWildsPage game)
+        {
+            return await game.GetStakePerSpinAsync();
+        }
+
+        [AllureStep("Spin #{spinNumber}")]
+        private async Task Step_Spin(IrishWildsPage game, int spinNumber, ref decimal lastBalance)
+        {
+            var before = await game.GetBalanceAsync();
+            await game.PressSpaceForSpinAsync();
+            await game.WaitForSpinToCompleteAsync(before);
+            lastBalance = await game.GetBalanceAsync();
+        }
+
+        [AllureStep("Validate balance changed")]
+        private Task Step_AssertBalanceChanged(decimal initial, decimal final)
+        {
+            Assert.That(final, Is.Not.EqualTo(initial), "Balance should change after spins.");
+            return Task.CompletedTask;
         }
     }
 }
