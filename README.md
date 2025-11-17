@@ -2,6 +2,7 @@
 
 This repository contains a small but production-style UI automation framework built on top of **.NET 9**, **Microsoft Playwright**, and **NUnit**.  
 The focus of the sample implementation is the **Irish Wilds** casino slot game and automated tests that validate **win/loss balance updates after multiple spins** on both desktop and mobile.
+REPORT : https://tosheto.github.io/casino-games-automation/
 
 ---
 
