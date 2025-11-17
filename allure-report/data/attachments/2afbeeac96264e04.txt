@@ -1,0 +1,182 @@
+[PlaywrightDriver] Created Mobile context (iPhone 13 Pro emulation).
+[IrishWildsPage] Navigated to products: https://www.spinberry.com/#products
+[IrishWildsPage] Accepted cookies.
+[IrishWildsPage] Found 'Play game' link. Clicking...
+[IrishWildsPage] No popup after Play game (or timeout): Element is not visible
+Call log:
+  - waiting for Locator("//h4[normalize-space()='Irish Wilds']/following::a[contains(@class,'showreel') and contains(@class,'play')][1]").First
+    - locator resolved to <a target="_blank" class="showreel play" rel="noopener noreferrer" href="https://tinyurl.com/39hjjjf3">…</a>
+  - attempting click action
+    - scrolling into view if needed
+[IrishWildsPage] Navigating to fallback GameUrl.
+[IrishWildsPage] On game host page: https://d21j22mhfwmuah.cloudfront.net/0Debug/SB_HTML5_IrishWilds94/index.html?gameCode=SB_HTML5_IrishWilds94&token=DEMO_PP_992f959d-f4dd-44d9-a29f-59b2c0b278d5&homeUrl=spinberrysite&rgsUrl=https://rgstorgs.stage.pariplaygames.com&lang=EN&DebugMode=False&currencyCode=USD&disableRotation=False&ExtraData=networkId%3dPP&HideCoins=True&CoinsDefault=True
+[IrishWildsPage] Frames on current page: 1
+[IrishWildsPage] No specific iframe; using main frame.
+[IrishWildsPage] Initial game frame: https://d21j22mhfwmuah.cloudfront.net/0Debug/SB_HTML5_IrishWilds94/index.html?gameCode=SB_HTML5_IrishWilds94&token=DEMO_PP_992f959d-f4dd-44d9-a29f-59b2c0b278d5&homeUrl=spinberrysite&rgsUrl=https://rgstorgs.stage.pariplaygames.com&lang=EN&DebugMode=False&currencyCode=USD&disableRotation=False&ExtraData=networkId%3dPP&HideCoins=True&CoinsDefault=True
+[IrishWildsPage] Intro Play button found. Clicking...
+[IrishWildsPage] Frames on current page: 1
+[IrishWildsPage] No specific iframe; using main frame.
+[IrishWildsPage] Game UI detected (balance & spin present).
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 2000.00 (BALANCE
+$2,000.00)
+[IrishWildsPage] (Stake/Bet) Using selector '[class*="bet" i], [class*="stake" i]' (found 3).
+[IrishWildsPage] Stake text is empty – returning 0 as fallback.
+[IrishWildsBalance_Mobile] Initial balance: 2000.00, stake: 0
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 2000.00 (BALANCE
+$2,000.00)
+[IrishWildsPage] PressSpaceForSpinAsync started.
+[IrishWildsPage] Canvas count = 1
+[IrishWildsPage] First canvas click for focus.
+[IrishWildsPage] JS Space injection executed.
+[IrishWildsPage] Second canvas click + Keyboard.Press(" ").
+[IrishWildsPage] PressSpaceForSpinAsync finished.
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1998.00 (BALANCE
+$1,998.00)
+[IrishWildsPage] Balance changed. Spin complete.
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1998.00 (BALANCE
+$1,998.00)
+[IrishWildsBalance_Mobile] Spin 1: before=2000.00, after=1998.00
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1998.00 (BALANCE
+$1,998.00)
+[IrishWildsPage] PressSpaceForSpinAsync started.
+[IrishWildsPage] Canvas count = 1
+[IrishWildsPage] First canvas click for focus.
+[IrishWildsPage] JS Space injection executed.
+[IrishWildsPage] Second canvas click + Keyboard.Press(" ").
+[IrishWildsPage] PressSpaceForSpinAsync finished.
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] Balance changed. Spin complete.
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsBalance_Mobile] Spin 2: before=1998.00, after=1996.80
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] PressSpaceForSpinAsync started.
+[IrishWildsPage] Canvas count = 1
+[IrishWildsPage] First canvas click for focus.
+[IrishWildsPage] JS Space injection executed.
+[IrishWildsPage] Second canvas click + Keyboard.Press(" ").
+[IrishWildsPage] PressSpaceForSpinAsync finished.
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] Spin wait timeout reached.
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsBalance_Mobile] Spin 3: before=1996.80, after=1996.80
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1996.80 (BALANCE
+$1,996.80)
+[IrishWildsPage] PressSpaceForSpinAsync started.
+[IrishWildsPage] Canvas count = 1
+[IrishWildsPage] First canvas click for focus.
+[IrishWildsPage] JS Space injection executed.
+[IrishWildsPage] Second canvas click + Keyboard.Press(" ").
+[IrishWildsPage] PressSpaceForSpinAsync finished.
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1994.80 (BALANCE
+$1,994.80)
+[IrishWildsPage] Balance changed. Spin complete.
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1994.80 (BALANCE
+$1,994.80)
+[IrishWildsBalance_Mobile] Spin 4: before=1996.80, after=1994.80
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1994.80 (BALANCE
+$1,994.80)
+[IrishWildsPage] PressSpaceForSpinAsync started.
+[IrishWildsPage] Canvas count = 1
+[IrishWildsPage] First canvas click for focus.
+[IrishWildsPage] JS Space injection executed.
+[IrishWildsPage] Second canvas click + Keyboard.Press(" ").
+[IrishWildsPage] PressSpaceForSpinAsync finished.
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1993.80 (BALANCE
+$1,993.80)
+[IrishWildsPage] Balance changed. Spin complete.
+[IrishWildsPage] (Balance) Using selector '[class*="balance" i], [id*="balance" i], [class*="credit" i]' (found 1).
+[IrishWildsPage] Balance: 1993.80 (BALANCE
+$1,993.80)
+[IrishWildsBalance_Mobile] Spin 5: before=1994.80, after=1993.80

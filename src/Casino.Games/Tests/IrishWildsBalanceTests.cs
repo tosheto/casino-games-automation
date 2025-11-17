@@ -2,10 +2,16 @@
 using Casino.Games.Drivers;
 using Casino.Games.Pages;
 using NUnit.Framework;
+using Allure.NUnit.Attributes;
+using Allure.NUnit;
+
 
 namespace Casino.Games.Tests
 {
     [TestFixture]
+    [AllureNUnit]
+    [AllureSuite("Irish Wilds")]
+    [AllureFeature("Balance & win/loss validation")]
     public class IrishWildsBalanceTests
     {
         private const int SpinsToPlay = 5;
