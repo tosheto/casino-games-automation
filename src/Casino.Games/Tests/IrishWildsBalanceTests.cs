@@ -53,7 +53,12 @@ namespace Casino.Games.Tests
             await OpenGameAsync(platform, browser, game);
 
             var initialBalance = await GetInitialBalanceAsync(platform, browser, game);
-            var finalBalance = await SpinAndGetFinalBalanceAsync(platform, browser, SpinsToPlay, game, initialBalance);
+            var finalBalance = await SpinAndGetFinalBalanceAsync(
+                platform,
+                browser,
+                SpinsToPlay,
+                game,
+                initialBalance);
 
             await VerifyBalanceChangedAsync(platform, browser, initialBalance, finalBalance);
         }
@@ -88,17 +93,24 @@ namespace Casino.Games.Tests
 
             for (int i = 0; i < spinsToPlay; i++)
             {
-                var before = await game.GetBalanceAsync();
+                var spinNumber = i + 1;
 
-                await game.PressSpaceForSpinAsync();
-                await game.WaitForSpinToCompleteAsync(before);
+                await AllureApi.Step(
+                    $"Spin #{spinNumber} ({platform} / {browser})",
+                    async () =>
+                    {
+                        var before = await game.GetBalanceAsync();
 
-                var after = await game.GetBalanceAsync();
+                        await game.PressSpaceForSpinAsync();
+                        await game.WaitForSpinToCompleteAsync(before);
 
-                TestContext.WriteLine(
-                    $"[IrishWildsBalance_{platform}] ({browser}) Spin {i + 1}: before={before}, after={after}");
+                        var after = await game.GetBalanceAsync();
 
-                lastBalance = after;
+                        TestContext.WriteLine(
+                            $"[IrishWildsBalance_{platform}] ({browser}) Spin {spinNumber}: before={before}, after={after}");
+
+                        lastBalance = after;
+                    });
             }
 
             return lastBalance;
