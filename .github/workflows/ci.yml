@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-permissions:
-  contents: write
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -40,8 +37,6 @@ jobs:
         run: ./src/Casino.Games/bin/Debug/net9.0/playwright.ps1 install --with-deps
 
       - name: Run NUnit Playwright tests (${{ matrix.target }})
-        env:
-          PLAYWRIGHT_HEADLESS: "true"
         run: |
           if [ "${{ matrix.target }}" = "desktop" ]; then
             dotnet test src/Casino.Games/Casino.Games.csproj \
@@ -56,50 +51,52 @@ jobs:
           fi
 
       - name: Upload TRX results
-        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: trx-${{ matrix.target }}
+          name: trx-results-${{ matrix.target }}
           path: src/Casino.Games/TestResults/*.trx
+          if-no-files-found: error
 
-      - name: Upload Allure results (desktop only)
-        if: always() && matrix.target == 'desktop'
+      - name: Upload Allure results
         uses: actions/upload-artifact@v4
         with:
-          name: allure-results-desktop
-          path: src/Casino.Games/bin/Debug/net9.0/allure-results
+          name: allure-results-${{ matrix.target }}
+          path: src/Casino.Games/allure-results
+          if-no-files-found: error
 
   allure-report:
     name: Build & publish Allure report
     needs: test
     runs-on: ubuntu-latest
-    if: always()
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download Allure results (desktop)
+      - name: Download Allure results
         uses: actions/download-artifact@v4
         with:
-          name: allure-results-desktop
+          pattern: allure-results-*
+          merge-multiple: true
           path: allure-results
 
-      # Generate Allure report + history using marketplace action
-      - name: Generate Allure report
-        uses: simple-elf/allure-report-action@v1.7
-        if: always()
+      - name: Setup Node.js (for Allure CLI)
+        uses: actions/setup-node@v4
         with:
-          allure_results: allure-results
-          allure_report: allure-report
-          gh_pages: gh-pages
-          allure_history: allure-history
+          node-version: "20"
 
-      # Deploy allure-history to gh-pages branch (this is what GitHub Pages will serve)
+      - name: Install Allure CLI
+        run: npm install -g allure-commandline
+
+      - name: Generate Allure report
+        run: |
+          ls -R
+          allure generate allure-results -o allure-report --clean
+
       - name: Deploy Allure report to GitHub Pages
-        if: always()
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
           publish_branch: gh-pages
-          publish_dir: allure-history
+          force_orphan: true
