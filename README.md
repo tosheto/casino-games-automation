@@ -7,6 +7,7 @@
 ![Allure](https://img.shields.io/badge/Allure-reporting-FF45A1)
 ![Status](https://img.shields.io/badge/Status-Portfolio%20Ready-brightgreen)
 ![Domain](https://img.shields.io/badge/Domain-Casino%20%2F%20Gambling-blueviolet)
+
 **Production-style UI automation framework** built with **.NET 9, Microsoft Playwright, and NUnit**.
 
 
