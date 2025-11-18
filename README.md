@@ -28,7 +28,6 @@ All reports are generated and published on **every push/PR to `main`** via GitHu
 - **Allure Report** — suites, steps, categories, trends & analytics  
   👉 https://tosheto.github.io/casino-games-automation/
 
-(Reports are static and can be shared as a public portfolio artifact.)
 
 ---
 
