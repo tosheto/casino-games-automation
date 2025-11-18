@@ -111,17 +111,3 @@ dotnet test src/Casino.Games/Casino.Games.csproj --configuration Debug
 
 ---
 
-## 🧪 What’s inside
-
-- **Test project:** src/Casino.Games/Casino.Games.csproj
-- **Drivers:** 
-- PlaywrightDriver – central place for browser/page creation:
-- Desktop context (Chromium / Firefox / WebKit)
-
-Mobile context (iPhone emulation, WebKit/Chromium)
-- **Browser automation:** Microsoft Playwright (.NET bindings)
-- **Reporting:** Allure .NET + CI-generated static Allure report
-- **Architecture:**
-
-
----
