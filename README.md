@@ -107,6 +107,7 @@ pwsh ./src/Casino.Games/bin/Debug/net9.0/playwright.ps1 install --with-deps
 
 # 3) Run tests (desktop + mobile categories)
 dotnet test src/Casino.Games/Casino.Games.csproj --configuration Debug
+```bash
 
 ## 🧪 What’s inside
 
