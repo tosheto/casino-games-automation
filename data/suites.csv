@@ -1,0 +1,6 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","63051","IrishWildsBalance_Desktop","","Tue Nov 18 07:09:04 UTC 2025","passed","Tue Nov 18 07:10:07 UTC 2025","Balance & win/loss validation","Irish Wilds","IrishWildsBalanceTests","IrishWildsBalance_Desktop"
+"","69958","IrishWildsBalance_Desktop","","Tue Nov 18 07:07:04 UTC 2025","passed","Tue Nov 18 07:08:13 UTC 2025","Balance & win/loss validation","Irish Wilds","IrishWildsBalanceTests","IrishWildsBalance_Desktop"
+"","59595","IrishWildsBalance_Mobile","","Tue Nov 18 07:09:32 UTC 2025","passed","Tue Nov 18 07:10:32 UTC 2025","Balance & win/loss validation","Irish Wilds","IrishWildsBalanceTests","IrishWildsBalance_Mobile"
+"","50706","IrishWildsBalance_Desktop","","Tue Nov 18 07:08:14 UTC 2025","passed","Tue Nov 18 07:09:04 UTC 2025","Balance & win/loss validation","Irish Wilds","IrishWildsBalanceTests","IrishWildsBalance_Desktop"
+"","137589","IrishWildsBalance_Mobile","","Tue Nov 18 07:07:15 UTC 2025","passed","Tue Nov 18 07:09:32 UTC 2025","Balance & win/loss validation","Irish Wilds","IrishWildsBalanceTests","IrishWildsBalance_Mobile"
