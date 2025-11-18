@@ -7,11 +7,12 @@
 ![Allure](https://img.shields.io/badge/Allure-reporting-FF45A1)
 ![Status](https://img.shields.io/badge/Status-Portfolio%20Ready-brightgreen)
 ![Domain](https://img.shields.io/badge/Domain-Casino%20%2F%20Gambling-blueviolet)
+**Production-style UI automation framework** built with **.NET 9, Microsoft Playwright, and NUnit**.
 
-Small but **production-style UI automation framework** built with **.NET 9, Microsoft Playwright, and NUnit**.
 
-The sample app under test is the **Irish Wilds** casino slot game.  
-The focus of the tests is **win/loss balance behavior** after multiple spins on both **desktop** and **mobile**.
+The casino slot game under test is the **Irish Wilds** 
+The focus of the tests is win/loss balance behavior after multiple spins on both desktop and mobile, with special emphasis on **automating a canvas-based slot game, where traditional DOM locators cannot be used**.
+Interaction with the Irish Wilds slot is achieved through **direct canvas event injection, keyboard emulation, and smart synchronization logic, enabling reliable end-to-end validation of game behavior without relying on visible UI elements**.
 
 ---
 
@@ -27,7 +28,6 @@ All reports are generated and published on **every push/PR to `main`** via GitHu
 
 - **Allure Report** — suites, steps, categories, trends & analytics  
   👉 https://tosheto.github.io/casino-games-automation/
-
 
 ---
 
@@ -107,50 +107,3 @@ pwsh ./src/Casino.Games/bin/Debug/net9.0/playwright.ps1 install --with-deps
 
 # 3) Run tests (desktop + mobile categories)
 dotnet test src/Casino.Games/Casino.Games.csproj --configuration Debug
-```bash
-
-## 🧪 What’s inside
-
-### **Test project**
-`src/Casino.Games/Casino.Games.csproj`
-
----
-
-### **Drivers**
-
-#### **PlaywrightDriver** — central place for browser/page creation:
-- **Desktop context:** Chromium / Firefox / WebKit  
-- **Mobile context:** iPhone emulation (WebKit / Chromium)
-
----
-
-### **Page Objects (POM)**
-
-- `IrishWildsPage.cs`
-- `IrishWildsPage.Space.cs` — canvas + keyboard interaction helpers
-
----
-
-### **Configuration**
-- `TestSettings.cs` — base URLs, game URLs, timeouts
-
----
-
-### **Tests**
-
-- `IrishWildsBalanceTests.cs`
-
-#### **Scenario breakdown into Allure steps**
-1. Open Irish Wilds game  
-2. Read initial balance & stake  
-3. Run **N** spins (each spin = its own Allure step)  
-4. Verify that the final balance changed  
-
----
-
-### **Utilities**
-- `BalanceHelper` — parse & compare UI monetary values  
-- `ReportingHelper` — centralized logging + Allure integration  
-
-
-
