@@ -71,8 +71,7 @@ On every push / PR to `main`, the pipeline:
 6. **Generates Allure HTML report** from the merged results.
 7. **Deploys the Allure report to GitHub Pages** (`gh-pages` branch).
 
-Result:  
-👉 https://tosheto.github.io/casino-games-automation/
+Result:  👉 https://tosheto.github.io/casino-games-automation/
 
 ---
 
@@ -108,5 +107,49 @@ pwsh ./src/Casino.Games/bin/Debug/net9.0/playwright.ps1 install --with-deps
 
 # 3) Run tests (desktop + mobile categories)
 dotnet test src/Casino.Games/Casino.Games.csproj --configuration Debug
+
+## 🧪 What’s inside
+
+### **Test project**
+`src/Casino.Games/Casino.Games.csproj`
+
+---
+
+### **Drivers**
+
+#### **PlaywrightDriver** — central place for browser/page creation:
+- **Desktop context:** Chromium / Firefox / WebKit  
+- **Mobile context:** iPhone emulation (WebKit / Chromium)
+
+---
+
+### **Page Objects (POM)**
+
+- `IrishWildsPage.cs`
+- `IrishWildsPage.Space.cs` — canvas + keyboard interaction helpers
+
+---
+
+### **Configuration**
+- `TestSettings.cs` — base URLs, game URLs, timeouts
+
+---
+
+### **Tests**
+
+- `IrishWildsBalanceTests.cs`
+
+#### **Scenario breakdown into Allure steps**
+1. Open Irish Wilds game  
+2. Read initial balance & stake  
+3. Run **N** spins (each spin = its own Allure step)  
+4. Verify that the final balance changed  
+
+---
+
+### **Utilities**
+- `BalanceHelper` — parse & compare UI monetary values  
+- `ReportingHelper` — centralized logging + Allure integration  
+
 
 
